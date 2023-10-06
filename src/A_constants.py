@@ -1,0 +1,21 @@
+import pandas as pd 
+import datetime 
+
+
+TARGET_INPUT_SHEET_NAME = "Combi Ant"
+
+DEFAULT_PLAN_START_DATE = datetime.date.today().strftime("%Y-%m-%d")
+DEFAULT_PLAN_FINISH_DATE = (pd.to_datetime(DEFAULT_PLAN_START_DATE) + datetime.timedelta(days = 13)).strftime("%Y-%m-%d")
+
+LINE_1_UPH = 70
+LINE_2_2WIRE_UPH = 67
+LINE_2_4WIRE_UPH = 64
+LINE_3_UPH = 57
+
+LINE_1_FULL_AVAILABILITY = 644
+LINE_2_2WIRE_FULL_AVAILABILITY = 672
+LINE_2_4WIRE_FULL_AVAILABILITY = 592
+LINE_3_FULL_AVAILABILITY = 528
+
+HMMA_PACK_QUANTITY = 28
+KIA_PACK_QUANTITY = 16
