@@ -77,7 +77,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                             line_inventory_plan.loc[line_inventory_plan["PART NUMBER"] == k, "Inventory"] += p_q
 
                             print("-- Check inventory plan: \n")
-                            display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == k].sort_values("date").head(14))
+                            # display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == k].sort_values("date").head(14))
             
                 if current_date_full_available >= 28:
                     print("-- Current target part: 96210-CW100EB")
@@ -91,7 +91,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     current_date_full_available -= to_28_divisible(current_date_full_available, "round")
 
                     print("-- Check inventory plan: \n")
-                    display(line_cw100_plan.head(14))
+                    # display(line_cw100_plan.head(14))
 
                     print("-- After plan, production availability: ", current_date_full_available)
                     print("-- Current date production: ", current_date_production, "\n")
@@ -126,7 +126,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                             line_inventory_plan.loc[line_inventory_plan["PART NUMBER"] == k, "Inventory"] += p_q
 
                             print("-- Check inventory plan: \n")
-                            display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == k].sort_values("date").head(14))
+                            # display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == k].sort_values("date").head(14))
 
                     current_target_before_date = current_target_info.date
                 else:
@@ -188,7 +188,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     ])
 
                     print("-- Check inventory plan: \n")
-                    display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == current_target_info["PART NUMBER"]].sort_values("date").head(14))
+                    # display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == current_target_info["PART NUMBER"]].sort_values("date").head(14))
 
 
                 current_date_priority = current_date_priority.drop("Inventory", axis = 1).merge(line_inventory_plan[["PART NUMBER", "date", "Inventory"]], 
@@ -297,7 +297,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
         current_date_priority = current_date_priority[current_date_priority.Shipping_plan > 0] 
 
         print("-- Original priority:")
-        display(current_date_priority.head(5))
+        # display(current_date_priority.head(5))
 
         current_wire = df_basic_info[df_basic_info["PART NUMBER"] == current_date_priority.iloc[0]["PART NUMBER"]].num_wire.values[0]
         uph = df_uph[(df_uph['LINE'] == '#2') & (df_uph["num_wire"] == current_wire)].uph.values[0]
@@ -317,7 +317,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
     
         while current_date_full_available > 16:
             print("-- Changed priority:")
-            display(current_date_priority.head(5))
+            # display(current_date_priority.head(5))
         
             if (current_date_priority[current_date_priority.date < satisfy_until_date].shape[0] == 0) & \
                (len(current_date_production) < 4) & \
@@ -339,7 +339,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 current_date_production["96210-CW100EB"] = to_28_divisible(current_date_full_available, "round")
                 current_date_full_available -= to_28_divisible(current_date_full_available, "round")
                 print("-- Check inventory plan: \n")
-                display(line_cw100_plan.head(14))
+                # display(line_cw100_plan.head(14))
                 print("-- After plan, production availability: ", current_date_full_available)
                 print("-- Current date production: ", current_date_production, "\n")
 
@@ -421,7 +421,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 ])
 
                 print("-- Check inventory plan: \n")
-                display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == current_target_info["PART NUMBER"]].sort_values("date").head(14))
+                # display(line_inventory_plan[line_inventory_plan["PART NUMBER"] == current_target_info["PART NUMBER"]].sort_values("date").head(14))
 
                 current_date_priority = current_date_priority.drop("Inventory", axis = 1).merge(line_inventory_plan[["PART NUMBER", "date", "Inventory"]],                                                                            how = "left", on = ["PART NUMBER", "date"])
                 current_date_priority = current_date_priority[(current_date_priority.Shipping_plan > 0) & (current_date_priority.Inventory < 0)] 

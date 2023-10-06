@@ -110,7 +110,8 @@ app.layout = dbc.Container([
     html.P("Click the process button to get the production plan."),
     process_button_component, 
     html.Br(),
-    html.Div(id = "result_container"),
+    html.Div(id = "result_container_1"),
+    html.Div(id = "result_container_2"),
     dcc.Store(id = "store_result"),
     html.Br(),
     
@@ -234,7 +235,17 @@ def store_availability(n_clicks, table_data):
 
 # 4. Process the production planning
 @app.callback(
-    [Output("result_container", "children"),
+    Output("result_container_1", "children"),
+    Input("process_button", "n_clicks"),
+    State("select_date_range", "start_date"),
+    State("select_date_range", "end_date"),
+    prevent_initial_call = True
+)
+def show_processing_text(n_clicks, start_date, end_date):
+    return html.P(f"--> Processing the production planning for {start_date} ~ {end_date} (Clicked at {datetime.datetime.now().strftime('%H: %M: %S')})")
+
+@app.callback(
+    [Output("result_container_2", "children"),
      Output("store_result", "data"),
      Output("line2_summary", "children"),
      Output("line3_summary", "children")],
@@ -262,7 +273,7 @@ def process_production_plan(n_clicks, store_data, start_date, end_date, availabi
         
         df_daily_full_available_pivot = pd.read_json(availability_data, orient = "split")
         df_daily_full_available_edited = pd.melt(df_daily_full_available_pivot, id_vars = ["LINE", "num_wire"], var_name = "date", value_name = "full_available")
-        display(df_daily_full_available_edited.sort_values(["date","LINE", "num_wire"]))
+        #display(df_daily_full_available_edited.sort_values(["date","LINE", "num_wire"]))
         
         line2_production_summary = Line2_production_plan(df, start_date, end_date, df_daily_full_available_edited)
         line3_production_summary = Line3_production_plan(df, start_date, end_date, df_daily_full_available_edited)
@@ -301,7 +312,7 @@ def process_production_plan(n_clicks, store_data, start_date, end_date, availabi
         production_summary_df_pivot.index = range(1, production_summary_df_pivot.shape[0] + 1)
 
         result_4 = html.Div([
-            html.P(f"--> Processing the production planning for {start_date} ~ {end_date} (Clicked at {datetime.datetime.now().strftime('%H: %M: %S')})"),
+            html.P(f"--> Finished production planning for {start_date} ~ {end_date} (Finished at {datetime.datetime.now().strftime('%H: %M: %S')})"),
             html.Button("Download the result plan excel file.", id = "download_result_button"),
             dcc.Download(id = "download_result"),
             html.P(" "),
