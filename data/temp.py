@@ -508,11 +508,39 @@ def Line3_production_plan(df, start_date, end_date):
 # %%
 df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
 df_daily_full_available, df_uph, df_basic_info = prepare_data(df, DEFAULT_PLAN_START_DATE, DEFAULT_PLAN_FINISH_DATE)
-
+df_daily_full_available
 # %%
 df_production_plan
 # %%
-df_daily_full_available
+df_daily_full_available_pivot = pd.pivot_table(df_daily_full_available.drop("day_of_week", axis = 1), values = "full_available", 
+                                              index = ["LINE", "num_wire"], columns = ["date"])
+df_daily_full_available_pivot = df_daily_full_available_pivot.reset_index()
+df_daily_full_available_pivot
+
+# %%
+df_daily_full_available_pivot_edited = pd.melt(df_daily_full_available_pivot, id_vars = ["LINE", "num_wire"], var_name = "date", value_name = "full_available")
+df_daily_full_available_pivot_edited[df_daily_full_available_pivot_edited["LINE"] == "#1"]
+
+
+# %%
+# %%
+pd.melt(df_inventory, id_vars = ["PROGRAM", "PART NUMBER", "LIST"], 
+                               var_name = "date", value_name = "Inventory").drop("LIST", axis = 1) \
+                       [["PART NUMBER", "PROGRAM", "date", "Inventory"]]
+
+# %%
+df_production_plan_pivot[[]]
+# %%
+df_production_plan_pivot.index.names = ["Index"]
+
+# %%
+df_production_plan_pivot.reset_index()
+
+# %%
+df_production_plan_pivot.to_dict("records")
+
+# %%
+[{"name": i, "id": i} for i in df_production_plan_pivot.columns]
 # %%
 line2_production_summary = Line2_production_plan(df, DEFAULT_PLAN_START_DATE, DEFAULT_PLAN_FINISH_DATE)
 output_text_list, line3_production_summary = Line3_production_plan(df, DEFAULT_PLAN_START_DATE, DEFAULT_PLAN_FINISH_DATE)
@@ -561,4 +589,3 @@ production_summary_df_pivot = pd.pivot_table(production_summary_df, index = ["PA
 production_summary_df_pivot.index = range(1, production_summary_df_pivot.shape[0] + 1)
 # %%
 production_summary_df_pivot
-# %%
