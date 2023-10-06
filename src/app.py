@@ -142,23 +142,20 @@ def save_uploaded_data(contents, filename):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     
-    upload_data_result = html.P(0)
     df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
-    upload_data_result = html.P(1)
     df = df.iloc[1:, 3:]
-    upload_data_result = html.P(2)
     
-    # try:
-    #     df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
-    #     df = df.iloc[1:, 3:]
-    #     upload_data_result = html.Div([
-    #         html.P(f"--> '{TARGET_INPUT_SHEET_NAME}' sheet from '{filename}' file is uploaded. (Uploaded at {datetime.datetime.now().strftime('%H: %M: %S')})"),
-    #         html.P( "--> Check the first 5 rows of the uploaded data. If it is the wrong file, then reupload a file.")
-    #     ])
+    try:
+        df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
+        df = df.iloc[1:, 3:]
+        upload_data_result = html.Div([
+            html.P(f"--> '{TARGET_INPUT_SHEET_NAME}' sheet from '{filename}' file is uploaded. (Uploaded at {datetime.datetime.now().strftime('%H: %M: %S')})"),
+            html.P( "--> Check the first 5 rows of the uploaded data. If it is the wrong file, then reupload a file.")
+        ])
     
-    # except:
-    #     df = pd.DataFrame()
-    #     upload_data_result = html.P(f"Uploaded file is wrong. There is no '{TARGET_INPUT_SHEET_NAME}' sheet on the file. Please check the file and try again.")
+    except:
+        df = pd.DataFrame()
+        upload_data_result = html.P(f"Error while uploading the file.")
     
     return [df.to_json(date_format='iso', orient='split'), upload_data_result]
 
