@@ -22,7 +22,7 @@ from D_production_plan import *
 # %%
 app = dash.Dash(__name__, external_stylesheets = [dbc.themes.BOOTSTRAP])
 app.config.suppress_callback_exceptions = True
-server = app.server
+#server = app.server
 
 # %%
 # Build the components
@@ -61,16 +61,10 @@ select_date_range_button_component = html.Button(
     id = "select_date_range_button"
 )
 
-availability_table_component = html.Div(
-    id = "availability_table"
-)
-
 edit_availability_button_component = html.Button(
     "Edit the availability",
     id = "edit_availability_button"
 )
-
-
 
 process_button_component = html.Button(
     "Process",
@@ -100,10 +94,12 @@ app.layout = dbc.Container([
     html.Br(),
     
     html.H6("3. Edit the production availability if needed."),
-    html.P("If there is some events (ex. holidays) that have an effect on the daily total production availability, edit the availability for the day and press the button."),
+    html.P("If there is some events (ex. holidays) that have an effect on the daily total production availability, edit the availability for the day from the below table and press the button."),
     html.P("If there is no event, just skip."),
-    html.Div(id = "availability_table"),
+    html.Div(id = "availability_table_container"),
+    html.Br(),
     edit_availability_button_component,
+    dcc.Store(id = "store_availability"),
     html.Br(),
     html.Br(),
     
@@ -184,20 +180,25 @@ def select_date_range(n_clicks, start_date, end_date):
     State("store_data", "data"),
     State("select_date_range", "start_date"),
     State("select_date_range", "end_date"),
+    prevent_initial_call = True
 )
-def show_availability_table(store_data, start_date, end_date):
-    df = pd.read_json(store_data, orient = "split")
+def show_availability_table(n_clicks, store_data, start_date, end_date):
+    try:
+        #df = pd.read_json(store_data, orient = "split")
+        df = pd.DataFrame({"date": [1, 2, 3, 4, 5], "line": [1,2,2,3,3], "availability": [644, 672, 672, 592, 592]})
+
+    except:
+        return html.P("Please upload the data first.")
     
-    
-    df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
-    df_daily_full_available, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    # df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
+    # df_daily_full_available, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
 
     availability_table = dash_table.DataTable(
-        df_daily_full_available.to_dict("records"),
-        [{"name": i, "id": i} for i in df_daily_full_available.columns]
+        df.to_dict("records"),
+        [{"name": i, "id": i} for i in df.columns]
     )
     
-    return html.P("check")
+    return [availability_table]
     
 
 @app.callback(
@@ -289,5 +290,7 @@ def download_result(n_clicks, store_result):
 # Run the App
 if __name__ == "__main__":
     app.run_server(debug = True)
+
+
 
 # %%
