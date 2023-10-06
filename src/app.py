@@ -139,6 +139,7 @@ def save_uploaded_data(contents, filename):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     upload_data_result = html.P("test")
+    df = pd.DataFrame()
     # try:
     #     df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
     #     df = df.iloc[1:, 3:]
