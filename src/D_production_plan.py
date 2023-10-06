@@ -8,10 +8,11 @@ warnings.filterwarnings("ignore")
 pd.set_option('display.max_rows', 50)
 
 # %%
-def Line3_production_plan(df, start_date, end_date):
+def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edited):
     df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
-    df_daily_full_available, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    _, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
     
+    df_daily_full_available = df_daily_full_available_edited
     print("==== Line 3 ==== \n")
 
     line_part_list = df_line_info[df_line_info["LINE"] == "#3"]["PART NUMBER"]
@@ -210,9 +211,11 @@ def Line3_production_plan(df, start_date, end_date):
     return production_summary
 
 # %%
-def Line3_production_plan_summary(df, start_date, end_date, production_summary):
+def Line3_production_plan_summary(df, start_date, end_date, production_summary, df_daily_full_available_edited):
     df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
-    df_daily_full_available, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    _, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    
+    df_daily_full_available = df_daily_full_available_edited
     
     summary_text_list = []
     
@@ -260,9 +263,11 @@ def Line3_production_plan_summary(df, start_date, end_date, production_summary):
         
     return summary_text_list
 # %%
-def Line2_production_plan(df, start_date, end_date):    
+def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edited):    
     df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
-    df_daily_full_available, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    _, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    
+    df_daily_full_available = df_daily_full_available_edited
     
     print("==== Line 2 ==== \n")
 
@@ -281,7 +286,7 @@ def Line2_production_plan(df, start_date, end_date):
     production_summary = {}
     
     while current_date != (pd.to_datetime(end_date) + datetime.timedelta(days = 1)).strftime("%Y-%m-%d"):
-        
+        print(f"======= Production plan start for {current_date}")
 
         satisfy_until_date = (pd.to_datetime(current_date) + 
                               datetime.timedelta(days = 10) - 
@@ -434,9 +439,11 @@ def Line2_production_plan(df, start_date, end_date):
 
     return production_summary
 # %%
-def Line2_production_plan_summary(df, start_date, end_date, production_summary):
+def Line2_production_plan_summary(df, start_date, end_date, production_summary, df_daily_full_available_edited):
     df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
-    df_daily_full_available, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    _, df_uph, df_basic_info = prepare_data(df, start_date, end_date)
+    
+    df_daily_full_available = df_daily_full_available_edited
     
     summary_text_list = []
     
