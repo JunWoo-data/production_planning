@@ -154,16 +154,6 @@ def save_uploaded_data(contents, filename):
         df = pd.DataFrame()
         upload_data_result = html.P(f"Error while uploading the file.")
     
-    df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
-    df = df.iloc[1:, 3:]
-    
-    upload_data_result = dash_table.DataTable(
-        df.to_dict("records"),
-        [{"name": i, "id": i} for i in df.columns],
-        editable = True,
-        id = "availability_table"
-    )
-    
     return [df.to_json(date_format='iso', orient='split'), upload_data_result]
 
 # 1. Show the uploaded data
