@@ -133,7 +133,8 @@ app.layout = dbc.Container([
     [Output("store_data", "data"),
      Output("upload_data_result", "children")],
     [Input("upload_data", "contents"),
-     Input("upload_data", "filename")]
+     Input("upload_data", "filename")],
+    prevent_initial_call = True
 )
 def save_uploaded_data(contents, filename):
     content_type, content_string = contents.split(',')
@@ -156,7 +157,8 @@ def save_uploaded_data(contents, filename):
 # 1. Show the uploaded data
 @app.callback(
     Output("uploaded_data_display", "children"),
-    Input("store_data", "data")
+    Input("store_data", "data"),
+    prevent_initial_call = True
 )
 def display_data_from_store(store_data):
     df = pd.read_json(store_data, orient = 'split')
