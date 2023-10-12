@@ -163,51 +163,52 @@ def Line3_production_plan_summary(df, start_date, end_date, production_summary, 
     # print("======= Production Summary for Line 3")
     summary_text_list.append("======= Production Summary for Line 3")
     for k, v in production_summary.items():
-        current_date_full_available = df_daily_full_available[(df_daily_full_available["LINE"] == "#3") & 
-                                                              (df_daily_full_available["date"] == k)].full_available.values[0]
-
-        uph = df_uph[df_uph['LINE'] == '#3'].uph.values[0]
-
-        production_plan_sum = 0
-        for v_k, v_v in v.items():
-            production_plan_sum += v_v
-
-        num_change_over = len(v) - 1 
-        num_change_over_btw_dfft_program = len(df_basic_info[df_basic_info['PART NUMBER'].isin(list(v.keys()))].PROGRAM.unique().tolist()) - 1
-        num_change_over_btw_same_program = num_change_over - num_change_over_btw_dfft_program
-        # print(f"[{k}]")
-        summary_text_list.append(f"[{k}]")
-        # print(f"-- Produce 4 wire parts")
-        summary_text_list.append(f"-- Produce 4 wire parts")
-        # print(f"-- UPH: {uph}")
-        summary_text_list.append(f"-- UPH: {uph}")
-        # print(f"-- Full production availability: {current_date_full_available}")
-        summary_text_list.append(f"-- Full production availability: {current_date_full_available}")
-        # print(f"-- Production plan:")
-        summary_text_list.append(f"-- Production plan:")
-        for v_k, v_v in v.items():
-            # print(f"    -- {v_k} : {v_v}")
-            summary_text_list.append(f"---- {v_k} : {v_v}")
-        # print(f"-- Number of change over: {num_change_over}") 
-        summary_text_list.append(f"-- Number of change over: {num_change_over}")
-        # print(f"---- Between different program: {num_change_over_btw_dfft_program} -> {15 * num_change_over_btw_dfft_program} mins downtime")
-        summary_text_list.append(f"---- Between different program: {num_change_over_btw_dfft_program} -> {CHANGEOVER_DOWNTIME_DIFFERENT_PROGRAM * num_change_over_btw_dfft_program} mins downtime")
-        # print(f"---- Between same program: {num_change_over_btw_same_program} -> {5 * num_change_over_btw_same_program} mins downtime")
-        summary_text_list.append(f"---- Between same program: {num_change_over_btw_same_program} -> {CHANGEOVER_DOWNTIME_SAME_PROGRAM * num_change_over_btw_same_program} mins downtime")
-        
-        total_changeover_downtime = (CHANGEOVER_DOWNTIME_DIFFERENT_PROGRAM * num_change_over_btw_dfft_program) + (CHANGEOVER_DOWNTIME_SAME_PROGRAM * num_change_over_btw_same_program)
-        # print(f"----> Total {total_changeover_downtime} mins downtime")
-        summary_text_list.append(f"----> Total {total_changeover_downtime} mins downtime")
-        
-        production_deduction = math.ceil(total_changeover_downtime * uph / 60)
-        # print(f"----> UPH: {uph} -> {total_changeover_downtime} mins: {production_deduction} production availability deduction")
-        summary_text_list.append(f"----> UPH: {uph} -> {total_changeover_downtime} mins: {production_deduction} production availability deduction")
-        # print(f"----> {current_date_full_available} - {production_deduction} =  {current_date_full_available - production_deduction} production available")
-        summary_text_list.append(f"----> {current_date_full_available} - {production_deduction} =  {current_date_full_available - production_deduction} production available")
-        # print(f"-- Production plan sum: {production_plan_sum}")
-        summary_text_list.append(f"-- Production plan sum: {production_plan_sum}")
-        # print("\n")
-        summary_text_list.append("\n")
+        if len(v) >= 1:
+            current_date_full_available = df_daily_full_available[(df_daily_full_available["LINE"] == "#3") & 
+                                                                  (df_daily_full_available["date"] == k)].full_available.values[0]
+    
+            uph = df_uph[df_uph['LINE'] == '#3'].uph.values[0]
+    
+            production_plan_sum = 0
+            for v_k, v_v in v.items():
+                production_plan_sum += v_v
+    
+            num_change_over = len(v) - 1 
+            num_change_over_btw_dfft_program = len(df_basic_info[df_basic_info['PART NUMBER'].isin(list(v.keys()))].PROGRAM.unique().tolist()) - 1
+            num_change_over_btw_same_program = num_change_over - num_change_over_btw_dfft_program
+            # print(f"[{k}]")
+            summary_text_list.append(f"[{k}]")
+            # print(f"-- Produce 4 wire parts")
+            summary_text_list.append(f"-- Produce 4 wire parts")
+            # print(f"-- UPH: {uph}")
+            summary_text_list.append(f"-- UPH: {uph}")
+            # print(f"-- Full production availability: {current_date_full_available}")
+            summary_text_list.append(f"-- Full production availability: {current_date_full_available}")
+            # print(f"-- Production plan:")
+            summary_text_list.append(f"-- Production plan:")
+            for v_k, v_v in v.items():
+                # print(f"    -- {v_k} : {v_v}")
+                summary_text_list.append(f"---- {v_k} : {v_v}")
+            # print(f"-- Number of change over: {num_change_over}") 
+            summary_text_list.append(f"-- Number of change over: {num_change_over}")
+            # print(f"---- Between different program: {num_change_over_btw_dfft_program} -> {15 * num_change_over_btw_dfft_program} mins downtime")
+            summary_text_list.append(f"---- Between different program: {num_change_over_btw_dfft_program} -> {CHANGEOVER_DOWNTIME_DIFFERENT_PROGRAM * num_change_over_btw_dfft_program} mins downtime")
+            # print(f"---- Between same program: {num_change_over_btw_same_program} -> {5 * num_change_over_btw_same_program} mins downtime")
+            summary_text_list.append(f"---- Between same program: {num_change_over_btw_same_program} -> {CHANGEOVER_DOWNTIME_SAME_PROGRAM * num_change_over_btw_same_program} mins downtime")
+            
+            total_changeover_downtime = (CHANGEOVER_DOWNTIME_DIFFERENT_PROGRAM * num_change_over_btw_dfft_program) + (CHANGEOVER_DOWNTIME_SAME_PROGRAM * num_change_over_btw_same_program)
+            # print(f"----> Total {total_changeover_downtime} mins downtime")
+            summary_text_list.append(f"----> Total {total_changeover_downtime} mins downtime")
+            
+            production_deduction = math.ceil(total_changeover_downtime * uph / 60)
+            # print(f"----> UPH: {uph} -> {total_changeover_downtime} mins: {production_deduction} production availability deduction")
+            summary_text_list.append(f"----> UPH: {uph} -> {total_changeover_downtime} mins: {production_deduction} production availability deduction")
+            # print(f"----> {current_date_full_available} - {production_deduction} =  {current_date_full_available - production_deduction} production available")
+            summary_text_list.append(f"----> {current_date_full_available} - {production_deduction} =  {current_date_full_available - production_deduction} production available")
+            # print(f"-- Production plan sum: {production_plan_sum}")
+            summary_text_list.append(f"-- Production plan sum: {production_plan_sum}")
+            # print("\n")
+            summary_text_list.append("\n")
         
     return summary_text_list
 
