@@ -19,10 +19,12 @@ from B_utils import *
 from C_prepare_data import *
 from D_production_plan import *
 
+
 # %%
 app = dash.Dash(__name__, external_stylesheets = [dbc.themes.BOOTSTRAP])
 app.config.suppress_callback_exceptions = True
 server = app.server
+
 
 # %%
 # Build the components
@@ -142,7 +144,7 @@ def save_uploaded_data(contents, filename):
     
     try:
         df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
-        df = df.iloc[1:, 3:]
+        df = df.iloc[1:, 2:]
         upload_data_result = html.Div([
             html.P(f"--> '{TARGET_INPUT_SHEET_NAME}' sheet from '{filename}' file is uploaded. (Uploaded at {datetime.datetime.now().strftime('%H: %M: %S')})"),
             html.P( "--> Check the first 5 rows of the uploaded data. If it is the wrong file, then reupload a file.")
@@ -304,10 +306,36 @@ def process_production_plan(n_clicks, store_data, start_date, end_date, availabi
         line1_production_summary_df = line1_production_summary_df[["PART NUMBER", "LINE", "date", "Production Plan"]]
 
         production_summary_df = pd.concat([line1_production_summary_df, line2_production_summary_df, line3_production_summary_df])
+        production_summary_df["date"] = pd.to_datetime(production_summary_df.date)
 
-        production_summary_df_pivot = pd.pivot_table(production_summary_df, index = ["PART NUMBER", "LINE"],
-                                                     values = "Production Plan", columns = "date").fillna(0).reset_index() \
-                                                                                          .sort_values(["LINE", "PART NUMBER"])
+        part_order = pd.DataFrame(df_production_plan["PART NUMBER"].unique(), columns = ["PART NUMBER"])
+        part_order["part_order_num"] = range(0, part_order.shape[0])
+        
+        original_production_plan = pd.melt(df[(df["LIST"] == "Production Plan") & (~df["LINE"].isna())].drop(["PROGRAM","LIST"], axis = 1),
+                                   id_vars = ["PART NUMBER", "LINE"], var_name = "date", value_name = "Original production_plan")
+
+        original_production_plan["date"] = pd.to_datetime(original_production_plan.date)
+        original_production_plan = original_production_plan.merge(production_summary_df, how = "left", on = ["PART NUMBER", "LINE", "date"])
+        original_production_plan[~original_production_plan["Production Plan"].isna()]
+        original_production_plan.loc[~original_production_plan["Production Plan"].isna(), "Production Plan Result"] \
+            = original_production_plan[~original_production_plan["Production Plan"].isna()]["Production Plan"]
+        original_production_plan.loc[original_production_plan["Production Plan"].isna(), "Production Plan Result"] \
+            = original_production_plan[original_production_plan["Production Plan"].isna()]["Original production_plan"]
+        original_production_plan.drop(["Original production_plan", "Production Plan"], axis = 1, inplace = True)
+        original_production_plan.fillna(0, inplace = True)
+        original_production_plan["date"] = original_production_plan["date"].dt.strftime("%Y-%m-%d")
+        # original_production_plan = original_production_plan[(original_production_plan.date >= start_date) & 
+        #                                                     (original_production_plan.date <= end_date)]
+        
+        production_summary_df_pivot = pd.pivot_table(original_production_plan, index = ["PART NUMBER", "LINE"],
+                                        values = "Production Plan Result", columns = "date").reset_index() 
+        production_summary_df_pivot = production_summary_df_pivot.merge(part_order, how = "left", on = "PART NUMBER")
+        production_summary_df_pivot = production_summary_df_pivot.sort_values(["part_order_num", "LINE"])
+        production_summary_df_pivot.drop("part_order_num", axis = 1, inplace = True)
+
+        # production_summary_df_pivot = pd.pivot_table(production_summary_df, index = ["PART NUMBER", "LINE"],
+        #                                              values = "Production Plan", columns = "date").fillna(0).reset_index() \
+        #                                                                                   .sort_values(["LINE", "PART NUMBER"])
         production_summary_df_pivot.index = range(1, production_summary_df_pivot.shape[0] + 1)
 
         result_4 = html.Div([
