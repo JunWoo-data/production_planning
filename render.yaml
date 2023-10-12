@@ -11,4 +11,4 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
-    entrypoint: gunicorn -b :$PORT main:app --timeout 120
+    entrypoint: gunicorn -b :$PORT main:app --timeout 600
