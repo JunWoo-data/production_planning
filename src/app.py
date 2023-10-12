@@ -97,6 +97,7 @@ app.layout = dbc.Container([
     html.Br(),
     
     html.H6("3. Edit the production availability if needed."),
+    html.P("Please wait until a table show up below."),
     html.P("If there is some events (ex. holidays) that have an effect on the daily total production availability, edit the availability for the day from the below table and click the button."),
     html.P("If there is no event, then just check the default availability and click the button."),
     html.Div(id = "availability_table_container"),
