@@ -314,8 +314,9 @@ def process_production_plan(n_clicks, store_data, start_date, end_date, availabi
         
         original_production_plan = pd.melt(df[(df["LIST"] == "Production Plan") & (~df["LINE"].isna())].drop(["PROGRAM","LIST"], axis = 1),
                                    id_vars = ["PART NUMBER", "LINE"], var_name = "date", value_name = "Original production_plan")
-
         original_production_plan["date"] = pd.to_datetime(original_production_plan.date)
+        original_production_plan.loc[(original_production_plan.date >= start_date) &
+                                 (original_production_plan.date <= end_date), "Original production_plan"] = 0
         original_production_plan = original_production_plan.merge(production_summary_df, how = "left", on = ["PART NUMBER", "LINE", "date"])
         original_production_plan[~original_production_plan["Production Plan"].isna()]
         original_production_plan.loc[~original_production_plan["Production Plan"].isna(), "Production Plan Result"] \
@@ -368,6 +369,3 @@ def download_result(n_clicks, store_result):
 # Run the App
 if __name__ == "__main__":
     app.run_server(debug = True)
-
-
-# %%

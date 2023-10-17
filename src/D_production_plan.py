@@ -32,10 +32,19 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
     while current_date != (pd.to_datetime(end_date) + datetime.timedelta(days = 1)).strftime("%Y-%m-%d"): 
         # print(f"======= Production plan start for {current_date}")
         
-        satisfy_until_date = (pd.to_datetime(current_date) + 
-                              datetime.timedelta(days = 10) - 
-                              datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
-
+        current_weekday = pd.to_datetime(current_date).weekday()
+        
+        if (current_weekday == 3) or (current_weekday == 4):
+            # 다음주 수요일까지
+            satisfy_until_date = (pd.to_datetime(current_date) + 
+                                  datetime.timedelta(days = 10) - 
+                                  datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
+        else:
+            # 다다음주 금요일까지
+            satisfy_until_date = (pd.to_datetime(current_date) + 
+                                  datetime.timedelta(days = 19) - 
+                                  datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
+        
         current_date_priority = line_inventory_plan[(line_inventory_plan["Inventory"] < 0) & (line_inventory_plan.date <= satisfy_until_date)].sort_values(["date", "Inventory"])
         current_date_priority = current_date_priority.merge(df_shipping_plan, how = "left", on = ["PART NUMBER", "PROGRAM", "date", "day_of_week"])
         current_date_priority = current_date_priority[current_date_priority.Shipping_plan > 0] 
@@ -53,7 +62,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
             # display(current_date_priority.head(5))
         
             if (current_date_priority.shape[0] == 0):
-                if current_date_full_available >= 28:
+                if (current_date_full_available >= 28):
                     # print("-- There are no shortage for the MQ4a parts. We now produce the 'CW100' part.")
                     # print("-- Current target part: 96210-CW100EB")
                     # print("-- Current production availability: ", current_date_full_available)
@@ -80,7 +89,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
 
                     # print("-- After plan, production availability: ", current_date_full_available)
                     # print("-- Current date production: ", current_date_production, "\n")
-            
+
                 current_date_full_available = 0
             
             else: 
@@ -237,11 +246,22 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
     
     while current_date != (pd.to_datetime(end_date) + datetime.timedelta(days = 1)).strftime("%Y-%m-%d"):
         # print(f"======= Production plan start for {current_date}")
-
-        satisfy_until_date = (pd.to_datetime(current_date) + 
-                              datetime.timedelta(days = 10) - 
-                              datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
-
+        current_weekday = pd.to_datetime(current_date).weekday()
+        
+        if (current_weekday == 3) or (current_weekday == 4):
+            # 다음주 수요일까지
+            satisfy_until_date = (pd.to_datetime(current_date) + 
+                                  datetime.timedelta(days = 10) - 
+                                  datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
+        else:
+            # 다다음주 금요일까지
+            satisfy_until_date = (pd.to_datetime(current_date) + 
+                                  datetime.timedelta(days = 19) - 
+                                  datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
+            
+        # print(f"weekday: {current_weekday}")
+        # print(f"satisfy_until_date: {satisfy_until_date}")
+        
         current_date_priority = line_inventory_plan[line_inventory_plan["Inventory"] < 0].sort_values(["date", "Inventory"])
         current_date_priority = current_date_priority.merge(df_shipping_plan, how = "left", on = ["PART NUMBER", "PROGRAM", "date", "day_of_week"])
         current_date_priority = current_date_priority[current_date_priority.Shipping_plan > 0] 
@@ -376,7 +396,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 current_date_priority = current_date_priority.drop("Inventory", axis = 1).merge(line_inventory_plan[["PART NUMBER", "date", "Inventory"]],                                                                            how = "left", on = ["PART NUMBER", "date"])
                 current_date_priority = current_date_priority[(current_date_priority.Shipping_plan > 0) & (current_date_priority.Inventory < 0)] 
                 current_date_priority = current_date_priority.sort_values(["date", "Inventory"])
-                if (len(current_date_production) == 4) & (current_wire == "4 wire"):
+                if (len(current_date_production) == 3) & (current_wire == "4 wire"):
                         current_date_priority = current_date_priority[current_date_priority["PART NUMBER"].isin(current_date_production.keys())] 
 
                 # print("-- After plan, production availability: ", current_date_full_available)
