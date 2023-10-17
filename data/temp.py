@@ -4,6 +4,10 @@ import numpy as np
 import datetime
 
 # %%
+df = pd.read_excel("Combi Ant Production Check sheet_Rev01_2023.xlsx", sheet_name = "Combi Ant", skiprows = 3)
+df = df.iloc[1:, 2:]
+df
+# %%
 TARGET_INPUT_SHEET_NAME = "Combi Ant"
 
 DEFAULT_PLAN_START_DATE = "2023-10-09"
@@ -543,10 +547,10 @@ df_production_plan_pivot.to_dict("records")
 [{"name": i, "id": i} for i in df_production_plan_pivot.columns]
 # %%
 line2_production_summary = Line2_production_plan(df, DEFAULT_PLAN_START_DATE, DEFAULT_PLAN_FINISH_DATE)
-output_text_list, line3_production_summary = Line3_production_plan(df, DEFAULT_PLAN_START_DATE, DEFAULT_PLAN_FINISH_DATE)
+line3_production_summary = Line3_production_plan(df, DEFAULT_PLAN_START_DATE, DEFAULT_PLAN_FINISH_DATE)
 
 # %%
-output_text_list[0]
+line2_production_summary
 # %%
 line2_production_summary_df = pd.DataFrame(columns = ["PART NUMBER", "LINE", "date", "Production Plan"])
 line3_production_summary_df = pd.DataFrame(columns = ["PART NUMBER", "LINE", "date", "Production Plan"])
