@@ -369,3 +369,5 @@ def download_result(n_clicks, store_result):
 # Run the App
 if __name__ == "__main__":
     app.run_server(debug = True)
+
+# %%
