@@ -143,7 +143,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 current_date_priority = current_date_priority[(current_date_priority.Shipping_plan > 0) & (current_date_priority.Inventory < 0)] 
                 current_date_priority = current_date_priority.sort_values(["date", "Inventory"])
                 
-                if (len(current_date_production) == 4):
+                if (len(current_date_production) == 3):
                     # print("-- We have produced 4 parts today. So we will produce only these parts today.")
                    
                     current_date_priority = line_inventory_plan[(line_inventory_plan["Inventory"] < 0)].sort_values(["date", "Inventory"])
