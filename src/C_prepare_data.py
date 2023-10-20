@@ -75,5 +75,3 @@ def prepare_data(df, PLAN_START_DATE, PLAN_FINISH_DATE):
         df_basic_info["P/Q"].fillna(KIA_PACK_QUANTITY, inplace = True)
         
         return df_line_info, df_inventory, df_shipping_plan, df_production_plan, df_daily_full_available, df_uph, df_basic_info
-
-# %%

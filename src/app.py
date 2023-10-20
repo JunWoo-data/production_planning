@@ -9,6 +9,7 @@ from dash import dash_table, html, dcc
 from dash.exceptions import PreventUpdate
 import dash_daq as daq
 
+from zoneinfo import ZoneInfo
 
 import base64
 import io 
@@ -18,6 +19,7 @@ from A_constants import *
 from B_utils import *
 from C_prepare_data import *
 from D_production_plan import *
+
 
 
 # %%
@@ -128,6 +130,7 @@ app.layout = dbc.Container([
 ])
 
 
+
 # %%
 # Define interactive flows
 
@@ -147,7 +150,7 @@ def save_uploaded_data(contents, filename):
         df = pd.read_excel(io.BytesIO(decoded), sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
         df = df.iloc[1:, 2:]
         upload_data_result = html.Div([
-            html.P(f"--> '{TARGET_INPUT_SHEET_NAME}' sheet from '{filename}' file is uploaded. (Uploaded at {datetime.datetime.now().strftime('%H: %M: %S')})"),
+            html.P(f"--> '{TARGET_INPUT_SHEET_NAME}' sheet from '{filename}' file is uploaded. (Uploaded at {datetime.datetime.now(ZoneInfo('America/New_York')).strftime('%H: %M: %S')})"),
             html.P( "--> Check the first 5 rows of the uploaded data. If it is the wrong file, then reupload a file.")
         ])
     
@@ -182,7 +185,7 @@ def display_data_from_store(store_data):
     prevent_initial_call = True
 )
 def select_date_range(n_clicks, start_date, end_date):
-    return html.P(f"--> Date range for the production plans: {start_date} ~ {end_date}")
+    return html.P(f"--> Date range for the production plans: {start_date} ~ {end_date} (Clicked at {datetime.datetime.now(ZoneInfo('America/New_York')).strftime('%H: %M: %S')})")
 
 # 3. show the availability table and save the table
 @app.callback(
@@ -229,7 +232,7 @@ def store_availability(n_clicks, table_data):
     df = pd.DataFrame(table_data)
     
     result = html.Div([
-        html.P(f"--> Saved the availability (Clicked at {datetime.datetime.now().strftime('%H: %M: %S')}))"),
+        html.P(f"--> Saved the availability (Clicked at {datetime.datetime.now(ZoneInfo('America/New_York')).strftime('%H: %M: %S')})"),
     ])
     
     return [result, 
@@ -244,7 +247,7 @@ def store_availability(n_clicks, table_data):
     prevent_initial_call = True
 )
 def show_processing_text(n_clicks, start_date, end_date):
-    return html.P(f"--> Processing the production planning for {start_date} ~ {end_date} (Clicked at {datetime.datetime.now().strftime('%H: %M: %S')})")
+    return html.P(f"--> Processing the production planning for {start_date} ~ {end_date} (Clicked at {datetime.datetime.now(ZoneInfo('America/New_York')).strftime('%H: %M: %S')})")
 
 @app.callback(
     [Output("result_container_2", "children"),
@@ -266,7 +269,7 @@ def process_production_plan(n_clicks, store_data, start_date, end_date, availabi
         df = pd.DataFrame()
         
     if df.shape[0] == 0:
-        result = html.P(f"--> There is no data... Please check the uploaded file. (Clicked at {datetime.datetime.now().strftime('%H: %M: %S')})")
+        result = html.P(f"--> There is no data... Please check the uploaded file. (Clicked at {datetime.datetime.now(ZoneInfo('America/New_York')).strftime('%H: %M: %S')})")
     
     else:
         df_line_info, df_inventory, df_shipping_plan, df_production_plan, \
@@ -341,7 +344,7 @@ def process_production_plan(n_clicks, store_data, start_date, end_date, availabi
         production_summary_df_pivot.index = range(1, production_summary_df_pivot.shape[0] + 1)
 
         result_4 = html.Div([
-            html.P(f"--> Finished production planning for {start_date} ~ {end_date} (Finished at {datetime.datetime.now().strftime('%H: %M: %S')})"),
+            html.P(f"--> Finished production planning for {start_date} ~ {end_date} (Finished at {datetime.datetime.now(ZoneInfo('America/New_York')).strftime('%H: %M: %S')})"),
             html.Button("Download the result plan excel file.", id = "download_result_button"),
             dcc.Download(id = "download_result"),
             html.P(" "),
@@ -365,6 +368,7 @@ def download_result(n_clicks, store_result):
     df = pd.read_json(store_result, orient = 'split')
     
     return dcc.send_data_frame(df.to_excel, f"antenna_production_plan_{datetime.date.today().strftime('%m-%d-%y')}.xlsx")
+
 # %%
 # Run the App
 if __name__ == "__main__":

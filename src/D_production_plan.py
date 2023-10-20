@@ -35,12 +35,12 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
         current_weekday = pd.to_datetime(current_date).weekday()
         
         if (current_weekday == 3) or (current_weekday == 4):
-            # 다음주 수요일까지
+            # 오늘이 목요일이나 금요일이면, 다음주 수요일까지 인벤토리가 부족하지 않은지 체크. 부족하지 않으면 뒤에서 cw100 생산할 예정.
             satisfy_until_date = (pd.to_datetime(current_date) + 
                                   datetime.timedelta(days = 10) - 
                                   datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
         else:
-            # 다다음주 금요일까지
+            # 오늘이 월 ~ 수 이면 다다음주 금요일까지 인벤토리가 부족하지 않은지 체크
             satisfy_until_date = (pd.to_datetime(current_date) + 
                                   datetime.timedelta(days = 19) - 
                                   datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
@@ -48,6 +48,11 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
         current_date_priority = line_inventory_plan[(line_inventory_plan["Inventory"] < 0) & (line_inventory_plan.date <= satisfy_until_date)].sort_values(["date", "Inventory"])
         current_date_priority = current_date_priority.merge(df_shipping_plan, how = "left", on = ["PART NUMBER", "PROGRAM", "date", "day_of_week"])
         current_date_priority = current_date_priority[current_date_priority.Shipping_plan > 0] 
+        current_date_priority.sort_values(["PART NUMBER", "date"], ascending = [True, False], inplace = True)
+        current_date_priority["target_inventory"] = current_date_priority.groupby("PART NUMBER").Inventory.shift(1)
+        current_date_priority.loc[current_date_priority.target_inventory.isna(), "target_inventory"] \
+                = current_date_priority.loc[current_date_priority.target_inventory.isna(), "Inventory"]
+        current_date_priority.sort_values(["date", "target_inventory"], inplace = True)
         
         uph = df_uph[(df_uph['LINE'] == '#3')].uph.values[0]
     
@@ -98,7 +103,8 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 # print("-- Current target part: ", current_target_info["PART NUMBER"])
                 # print("-- Current production availability: ", current_date_full_available)
                       
-                if len(current_date_production) >= 2:
+                if (len(current_date_production) >= 1) & \
+                   (pd.Series(current_date_production.keys()).isin([current_target_info["PART NUMBER"]]).sum() == 0):
                     changeover_downtime = CHANGEOVER_DOWNTIME_SAME_PROGRAM
                     # print("-- Change over downtime: ", changeover_downtime, " mins")
                     production_deduction = math.floor(changeover_downtime * uph / 60)
@@ -106,8 +112,9 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
                     current_date_full_available -= production_deduction
                 
-                # print("-- Current target shortage: ", current_target_info["Inventory"], " on ", current_target_info["date"])
-                production_amount = to_16_divisible(-current_target_info.Inventory, "up") + 16
+                # print("-- Current target this shipment shortage: ", current_target_info["Inventory"], " on ", current_target_info["date"])
+                # print("-- Current target next shipment shortage: ", current_target_info["target_inventory"])
+                production_amount = to_16_divisible(-current_target_info.target_inventory, "up")
                 
                 if production_amount > current_date_full_available:
                     production_amount = to_16_divisible(current_date_full_available, "down")
@@ -142,14 +149,24 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                                                                                                 how = "left", on = ["PART NUMBER", "date"])
                 current_date_priority = current_date_priority[(current_date_priority.Shipping_plan > 0) & (current_date_priority.Inventory < 0)] 
                 current_date_priority = current_date_priority.sort_values(["date", "Inventory"])
+                current_date_priority.sort_values(["PART NUMBER", "date"], ascending = [True, False], inplace = True)
+                current_date_priority["target_inventory"] = current_date_priority.groupby("PART NUMBER").Inventory.shift(1)
+                current_date_priority.loc[current_date_priority.target_inventory.isna(), "target_inventory"] \
+                        = current_date_priority.loc[current_date_priority.target_inventory.isna(), "Inventory"]
+                current_date_priority.sort_values(["date", "target_inventory"], inplace = True)
                 
                 if (len(current_date_production) == 3):
-                    # print("-- We have produced 4 parts today. So we will produce only these parts today.")
+                    # print("-- We have produced 3 parts today. So we will produce only these parts today.")
                    
                     current_date_priority = line_inventory_plan[(line_inventory_plan["Inventory"] < 0)].sort_values(["date", "Inventory"])
                     current_date_priority = current_date_priority.merge(df_shipping_plan, how = "left", on = ["PART NUMBER", "PROGRAM", "date", "day_of_week"])
                     current_date_priority = current_date_priority[current_date_priority.Shipping_plan > 0] 
                     current_date_priority = current_date_priority[current_date_priority["PART NUMBER"].isin(current_date_production.keys())]
+                    current_date_priority.sort_values(["PART NUMBER", "date"], ascending = [True, False], inplace = True)
+                    current_date_priority["target_inventory"] = current_date_priority.groupby("PART NUMBER").Inventory.shift(1)
+                    current_date_priority.loc[current_date_priority.target_inventory.isna(), "target_inventory"] \
+                            = current_date_priority.loc[current_date_priority.target_inventory.isna(), "Inventory"]
+                    current_date_priority.sort_values(["date", "target_inventory"], inplace = True)
                             
                 # print("-- After plan, production availability: ", current_date_full_available)
                 # print("-- Current date production: ", current_date_production)
@@ -157,7 +174,8 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                         
         production_summary[current_date] = current_date_production
         current_date = (pd.to_datetime(current_date) + datetime.timedelta(days = 1)).strftime("%Y-%m-%d")  
-        
+        # print("\n")
+         
     return production_summary       
                 
 # %%
