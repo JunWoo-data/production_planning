@@ -34,7 +34,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
         
         current_weekday = pd.to_datetime(current_date).weekday()
         
-        if (current_weekday == 3) or (current_weekday == 4):
+        if (current_weekday == 4):
             # 오늘이 목요일이나 금요일이면, 다음주 수요일까지 인벤토리가 부족하지 않은지 체크. 부족하지 않으면 뒤에서 cw100 생산할 예정.
             satisfy_until_date = (pd.to_datetime(current_date) + 
                                   datetime.timedelta(days = 10) - 
