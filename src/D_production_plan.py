@@ -30,7 +30,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
     production_summary = {}
     
     while current_date != (pd.to_datetime(end_date) + datetime.timedelta(days = 1)).strftime("%Y-%m-%d"): 
-        # print(f"======= Production plan start for {current_date}")
+        print(f"======= Production plan start for {current_date}")
         
         current_weekday = pd.to_datetime(current_date).weekday()
         
@@ -52,7 +52,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
         current_date_priority["target_inventory"] = current_date_priority.groupby("PART NUMBER").Inventory.shift(1)
         current_date_priority.loc[current_date_priority.target_inventory.isna(), "target_inventory"] \
                 = current_date_priority.loc[current_date_priority.target_inventory.isna(), "Inventory"]
-        current_date_priority.sort_values(["date", "target_inventory"], inplace = True)
+        current_date_priority.sort_values(["date", "Inventory"], inplace = True)
         
         uph = df_uph[(df_uph['LINE'] == '#3')].uph.values[0]
     
@@ -80,8 +80,8 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     if changeover_downtime > 0:
                         # print("-- Change over downtime: ", changeover_downtime, " mins")
                         production_deduction = math.floor(changeover_downtime * uph / 60)
-                        # print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
-                        # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
+                        print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
+                        print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
                         current_date_full_available -= production_deduction
                     
                     # print("-- Production plan: ", to_28_divisible(current_date_full_available, "round"))
@@ -108,8 +108,8 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     changeover_downtime = CHANGEOVER_DOWNTIME_SAME_PROGRAM
                     # print("-- Change over downtime: ", changeover_downtime, " mins")
                     production_deduction = math.floor(changeover_downtime * uph / 60)
-                    # print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
-                    # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
+                    print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
+                    print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
                     current_date_full_available -= production_deduction
                 
                 # print("-- Current target this shipment shortage: ", current_target_info["Inventory"], " on ", current_target_info["date"])
@@ -414,7 +414,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 current_date_priority = current_date_priority.drop("Inventory", axis = 1).merge(line_inventory_plan[["PART NUMBER", "date", "Inventory"]],                                                                            how = "left", on = ["PART NUMBER", "date"])
                 current_date_priority = current_date_priority[(current_date_priority.Shipping_plan > 0) & (current_date_priority.Inventory < 0)] 
                 current_date_priority = current_date_priority.sort_values(["date", "Inventory"])
-                if (len(current_date_production) == 3) & (current_wire == "4 wire"):
+                if (len(current_date_production) == 4) & (current_wire == "4 wire"):
                         current_date_priority = current_date_priority[current_date_priority["PART NUMBER"].isin(current_date_production.keys())] 
 
                 # print("-- After plan, production availability: ", current_date_full_available)
