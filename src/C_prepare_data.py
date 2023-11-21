@@ -77,10 +77,11 @@ def prepare_data(df, PLAN_START_DATE, PLAN_FINISH_DATE):
         return df_line_info, df_inventory, df_shipping_plan, df_production_plan, df_daily_full_available, df_uph, df_basic_info
 
 # # %%
-# PLAN_START_DATE = "2023-11-09"
-# PLAN_FINISH_DATE = "2023-11-14"
+# PLAN_START_DATE = "2023-12-04"
+# PLAN_FINISH_DATE = "2023-12-15"
+
 # # %%
-# df = pd.read_excel("C:\\Users\\young\\Dropbox\\Work\\INFAC\\documents\\production_plan\\production_planning_website\\data\\Combi Ant Production Check sheet_Rev02_2023_110923_jun.xlsx", 
+# df = pd.read_excel("C:\\Users\\young\\Dropbox\\Work\\INFAC\\documents\\production_plan\\production_planning_website\\data\\Combi Ant Production Check sheet_Rev02_2023_112023_original.xlsx", 
 #                    sheet_name = TARGET_INPUT_SHEET_NAME, skiprows = 3)
 # df = df.iloc[1:, 2:]
 # df

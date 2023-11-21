@@ -1,0 +1,13 @@
+[11/13 월요일]
+- line 2: 5100, 5110 기본정보 입력
+- line 2: PE parts change over downtime 정보 입력
+- line 3: edit to produce extra pack quantity
+- line 3: from thursday help line 1
+
+[11/20]
+- Add rule for the 2 wire production plan of Line 2
+
+[11/21]
+- Line2: permit 3 change over
+
+
