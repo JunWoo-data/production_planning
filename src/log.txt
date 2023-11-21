@@ -9,5 +9,6 @@
 
 [11/21]
 - Line2: permit 3 change over
+# Line2: some 2 wire don't have extra pack quantity. need to check.
 
 

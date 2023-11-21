@@ -30,7 +30,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
     production_summary = {}
     
     while current_date != (pd.to_datetime(end_date) + datetime.timedelta(days = 1)).strftime("%Y-%m-%d"): 
-        print(f"======= Production plan start for {current_date}")
+        # print(f"======= Production plan start for {current_date}")
         
         current_weekday = pd.to_datetime(current_date).weekday()
         
@@ -80,8 +80,8 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     if changeover_downtime > 0:
                         # print("-- Change over downtime: ", changeover_downtime, " mins")
                         production_deduction = math.floor(changeover_downtime * uph / 60)
-                        print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
-                        print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
+                        # print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
+                        # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
                         current_date_full_available -= production_deduction
                     
                     # print("-- Production plan: ", to_28_divisible(current_date_full_available, "round"))
@@ -108,8 +108,8 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                     changeover_downtime = CHANGEOVER_DOWNTIME_SAME_PROGRAM
                     # print("-- Change over downtime: ", changeover_downtime, " mins")
                     production_deduction = math.floor(changeover_downtime * uph / 60)
-                    print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
-                    print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
+                    # print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
+                    # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
                     current_date_full_available -= production_deduction
                 
                 # print("-- Current target this shipment shortage: ", current_target_info["Inventory"], " on ", current_target_info["date"])
