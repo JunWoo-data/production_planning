@@ -11,4 +11,11 @@
 - Line2: permit 3 change over
 # Line2: some 2 wire don't have extra pack quantity. need to check.
 
+[11/22]
+- Line2: change 4 wire uph from 64 to 60 
+- Line2: do not help NX4a 
+- Line3: change satisfy until date to next friday
 
+[12/4]
+- Line2: change 2 wire UPH from 67 to 73
+- Line3: Do not permit change over if the remaining production availability is less than 32.

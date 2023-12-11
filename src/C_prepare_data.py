@@ -158,4 +158,4 @@ def prepare_data(df, PLAN_START_DATE, PLAN_FINISH_DATE):
 # df_basic_info.loc[df_basic_info["PART NUMBER"].str.split("-").str[1].str[:2].isin(["CW"]), "P/Q"] = HMMA_PACK_QUANTITY
 # df_basic_info["P/Q"].fillna(KIA_PACK_QUANTITY, inplace = True)
 # df_basic_info
-# # %%
+# %%

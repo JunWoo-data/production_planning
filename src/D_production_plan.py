@@ -155,7 +155,7 @@ def Line3_production_plan(df, start_date, end_date, df_daily_full_available_edit
                         = current_date_priority.loc[current_date_priority.target_inventory.isna(), "Inventory"]
                 current_date_priority.sort_values(["date", "target_inventory"], inplace = True)
                 
-                if (len(current_date_production) == 3):
+                if (len(current_date_production) == 3) | (current_date_full_available <= 32):
                     # print("-- We have produced 3 parts today. So we will produce only these parts today.")
                    
                     current_date_priority = line_inventory_plan[(line_inventory_plan["Inventory"] < 0)].sort_values(["date", "Inventory"])
@@ -266,16 +266,9 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
         # print(f"======= Production plan start for {current_date}")
         current_weekday = pd.to_datetime(current_date).weekday()
         
-        if (current_weekday == 3) or (current_weekday == 4):
-            # 다음주 수요일까지
-            satisfy_until_date = (pd.to_datetime(current_date) + 
-                                  datetime.timedelta(days = 10) - 
-                                  datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
-        else:
-            # 다다음주 금요일까지
-            satisfy_until_date = (pd.to_datetime(current_date) + 
-                                  datetime.timedelta(days = 19) - 
-                                  datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
+        satisfy_until_date = (pd.to_datetime(current_date) + 
+                              datetime.timedelta(days = 33) - 
+                              datetime.timedelta(days = (pd.to_datetime(current_date).weekday() + 1))).strftime("%Y-%m-%d")
             
         # print(f"weekday: {current_weekday}")
         # print(f"satisfy_until_date: {satisfy_until_date}")
@@ -307,34 +300,34 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
             # print("-- Changed priority:")
             # display(current_date_priority.head(5))
         
-            if (current_date_priority[current_date_priority.date < satisfy_until_date].shape[0] == 0) & \
-               (len(current_date_production) < 4) & \
-               (current_wire == "4 wire"):
-                # print("-- There are no remaining KIA antenna parts until next week. Move to CW100EB part.")
-                # print("-- Current target part: 96210-CW100EB")
-                # print("-- Current production availability: ", current_date_full_available)
+            # if (current_date_priority[current_date_priority.date < satisfy_until_date].shape[0] == 0) & \
+            #    (len(current_date_production) <= 4) & \
+            #    (current_wire == "4 wire"):
+            #     # print("-- There are no remaining KIA antenna parts until next week. Move to CW100EB part.")
+            #     # print("-- Current target part: 96210-CW100EB")
+            #     # print("-- Current production availability: ", current_date_full_available)
             
-                if len(current_date_production) != 0:
-                    changeover_downtime = CHANGEOVER_DOWNTIME_DIFFERENT_PROGRAM
-                    # print("-- Change over downtime: ", changeover_downtime, " mins")
-                    production_deduction = math.floor(changeover_downtime * uph / 60)
-                    # print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
-                    # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
-                    current_date_full_available -= production_deduction
+            #     if len(current_date_production) != 0:
+            #         changeover_downtime = CHANGEOVER_DOWNTIME_DIFFERENT_PROGRAM
+            #         # print("-- Change over downtime: ", changeover_downtime, " mins")
+            #         production_deduction = math.floor(changeover_downtime * uph / 60)
+            #         # print(f"    -- UPH: {uph} -> {changeover_downtime} mins: {production_deduction} production availability deduction")
+            #         # print(f"    -- {current_date_full_available} - {production_deduction} = {current_date_full_available - production_deduction} production available")
+            #         current_date_full_available -= production_deduction
             
-                # print("-- Production plan: ", to_28_divisible(current_date_full_available, "round"))
-                line_cw100_plan.loc[line_cw100_plan.date == current_date, "Production_plan"] = to_28_divisible(current_date_full_available, "round")
-                current_date_production["96210-CW100EB"] = to_28_divisible(current_date_full_available, "round")
-                current_date_full_available -= to_28_divisible(current_date_full_available, "round")
-                # print("-- Check inventory plan: \n")
-                # display(line_cw100_plan.head(14))
-                # print("-- After plan, production availability: ", current_date_full_available)
-                # print("-- Current date production: ", current_date_production, "\n")
+            #     # print("-- Production plan: ", to_28_divisible(current_date_full_available, "round"))
+            #     line_cw100_plan.loc[line_cw100_plan.date == current_date, "Production_plan"] = to_28_divisible(current_date_full_available, "round")
+            #     current_date_production["96210-CW100EB"] = to_28_divisible(current_date_full_available, "round")
+            #     current_date_full_available -= to_28_divisible(current_date_full_available, "round")
+            #     # print("-- Check inventory plan: \n")
+            #     # display(line_cw100_plan.head(14))
+            #     # print("-- After plan, production availability: ", current_date_full_available)
+            #     # print("-- Current date production: ", current_date_production, "\n")
 
-                current_date_full_available = 0
+            #     current_date_full_available = 0
             
-            elif (current_wire == "2 wire") & \
-                 (current_date_priority[current_date_priority.date < satisfy_until_date].shape[0] == 0):
+            if (current_wire == "2 wire") & \
+               (current_date_priority.shape[0] == 0):
                 # print("-- There are no remaining KIA antenna 2 wire parts until next week. Just produce CW000EB part.")
                 # print("-- Current target part: 96210-CW000EB")
                 # print("-- Current production availability: ", current_date_full_available)
@@ -451,7 +444,7 @@ def Line2_production_plan(df, start_date, end_date, df_daily_full_available_edit
                 current_date_priority = current_date_priority.drop("Inventory", axis = 1).merge(line_inventory_plan[["PART NUMBER", "date", "Inventory"]],                                                                            how = "left", on = ["PART NUMBER", "date"])
                 current_date_priority = current_date_priority[(current_date_priority.Shipping_plan > 0) & (current_date_priority.Inventory < 0)] 
                 current_date_priority = current_date_priority.sort_values(["date", "Inventory"])
-                if (len(current_date_production) == 4) & (current_wire == "4 wire"):
+                if (len(current_date_production) == 2) & (current_wire == "4 wire"):
                         current_date_priority = current_date_priority[current_date_priority["PART NUMBER"].isin(current_date_production.keys())] 
 
                 
