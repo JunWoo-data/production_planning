@@ -84,6 +84,7 @@ process_button_component = html.Button(
 
 
 
+
 # %%
 # Design the App layout
 app.layout = dbc.Container([
